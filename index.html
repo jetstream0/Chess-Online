@@ -11,8 +11,21 @@
     <div class="board" id="board">
     </div>
     <script>
+      let moved = false;
+      let current_color = "white";
       create_board();
       let board = setup_board();
+      //iterate through board, attach square_onclick(square, current_color) to every square with own piece
+      for (i=0; i < Object.keys(board.board_matrix).length; i++) {
+        for (j=0; j < 8; j++) {
+          let square = board.board_matrix[Object.keys(board.board_matrix)[i]][j];
+          if (square.color == current_color) {
+            document.getElementById(Object.keys(board.board_matrix)[i]+String(j+1)).setAttribute("onclick","square_onclick(this.id)");
+          }
+        }
+      }
+      //wait for person to make a move
+      waitFor(_ => moved === true).then(_ => console.log('reconsturct board here'));
     </script>
   </body>
 </html>

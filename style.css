@@ -27,3 +27,7 @@
   height: 400px;
   width: 400px;
 }
+
+.highlight-piece {
+  text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px yellow, 0 0 30px yellow, 0 0 40px yellow, 0 0 55px yellow, 0 0 70px yellow; 
+}
