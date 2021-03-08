@@ -10,8 +10,14 @@ class Board {
     piece.change_location(destination);
     this.board_matrix[destination[0]][destination[1]] = piece;
   }
-  is_king_in_check() {
-    //get attacking squares of all pieces. see if any of them attack the other piece
+  is_king_in_check(color) {
+    //get attacking squares of all pieces. see if any of them attack the other color's king piece
+  }
+  is_stalemate() {
+
+  }
+  is_checkmate() {
+
   }
 }
 
@@ -28,14 +34,180 @@ class Piece {
     //NOTE: make sure moves don't put king in check
     let possible_moves = [];
     let attacking_squares = this.get_attacking_squares(board_matrix);
+    console.log(attacking_squares)
     if (this.type == "king") {
-      if (!already_moved) {
-        //check if it an castle
-      }
       if (this.color == "white") {
-
+        if (!this.already_moved) {
+          //check if it can castle
+          //check the pieces where the rooks would be, make sure those are rooks, make sure they did not move. make sure no pieces are in between. if all that, then add castling to the moves
+          //obviously make sure king isnt in check
+          if (board_matrix['a'][0].type == "rook" && !board_matrix['a'][0].already_moved) {
+            //check pieces in between
+            if (board_matrix['b'][0] == "" && board_matrix['c'][0] == "" && board_matrix['d'][0] == "") {
+              //add to moves
+              possible_moves.push("b1-castle");
+            }
+          }
+          if (board_matrix['h'][0].type == "rook" && !board_matrix['h'][0].already_moved) {
+            if (board_matrix['f'][0] == "" && board_matrix['g'][0] == "") {
+              //add to moves
+              possible_moves.push("g1-castle");
+            }
+          }
+        }
+        //in front of the king
+        if (this.location[1]+1 < 9) {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]+1);
+          possible_moves.push(possible_move);
+        }
+        //behind the king
+        if (this.location[1]-1 > 0) {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]-1);
+          possible_moves.push(possible_move);
+        }
+        //to the left 3 of the king
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          //immediately to the left
+          if (board_matrix[column][this.location[1]-1].color != "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            possible_moves.push(possible_move);
+          }
+          //left down
+          if (this.location-1 > 0) {
+            if (board_matrix[column][this.location[1]-2].color != "white") {
+              let possible_move = [];
+              possible_move.push(column);
+              possible_move.push(this.location[1]-1);
+              possible_moves.push(possible_move);
+            }
+          }
+          //left up
+          if (this.location+1 < 9) {
+            if (board_matrix[column][this.location[1]].color != "white") {
+              let possible_move = [];
+              possible_move.push(column);
+              possible_move.push(this.location[1]+1);
+              possible_moves.push(possible_move);
+            }
+          }
+        }
+        //right 3 of the king
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          //immediately to the right
+          if (board_matrix[column][this.location[1]-1].color != "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            possible_moves.push(possible_move);
+          }
+          //right up
+          if (this.location[1]+1 < 9) {
+            if (board_matrix[column][this.location[1]].color != "white") {
+              let possible_move = [];
+              possible_move.push(column);
+              possible_move.push(this.location[1]+1);
+              possible_moves.push(possible_move);
+            }
+          }
+          //right down
+          if (this.location[1]-1 > 0) {
+            if (board_matrix[column][this.location[1]-2].color != "white") {
+              let possible_move = [];
+              possible_move.push(column);
+              possible_move.push(this.location[1]-1);
+              possible_moves.push(possible_move);
+            }
+          }
+        }
       } else if (this.color == "black") {
-        
+        if (!this.already_moved) {
+          //check if it an castle
+          if (board_matrix['a'][7].type == "rook" && !board_matrix['a'][7].already_moved) {
+            if (board_matrix['b'][7] == "" && board_matrix['c'][7] == "" && board_matrix['d'][7] == "") {
+              possible_moves.push("b7-castle");
+            }
+          }
+          if (board_matrix['h'][7].type == "rook" && !board_matrix['h'][7].already_moved) {
+            if (board_matrix['f'][7] == "" && board_matrix['g'][7] == "") {
+              possible_moves.push("g7-castle");
+            }
+          }
+        }
+        //in front of king
+        if (this.location[1]-1 > 0) {
+          if (board_matrix[column][this.location[1]].color != "black") {
+            let possible_move = [];
+            possible_move.push(this.location[0]);
+            possible_move.push(this.location[1]-1);
+            possible_moves.push(possible_move);
+          }
+        }
+        //behind king
+        if (this.location[1]+1 < 9) {
+          if (board_matrix[column][this.location[1]].color != "black") {
+            let possible_move = [];
+            possible_move.push(this.location[0]);
+            possible_move.push(this.location[1]+1);
+            possible_moves.push(possible_move);
+          }
+        }
+      }
+      //three to the left, three to the right
+      if (this.location[0] != "a") {
+        let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+        //just to the right (from black perspective) 
+        if (board_matrix[column][this.location[1]-1].color != "black") {
+          let possible_move = [];
+          possible_move.push(column);
+          possible_move.push(this.location[1]);
+          possible_moves.push(possible_move);
+        }
+        //right below
+        if (board_matrix[column][this.location[1]].color != "black") {
+          let possible_move = [];
+          possible_move.push(column);
+          possible_move.push(this.location[1]+1);
+          possible_moves.push(possible_move);
+        }
+        //right above
+        if (board_matrix[column][this.location[1]-2].color != "black") {
+          let possible_move = [];
+          possible_move.push(column);
+          possible_move.push(this.location[1]-1);
+          possible_moves.push(possible_move);
+        }
+      }
+      if (this.location[0] != "h") {
+        let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+        //just to the left (from black perspective) 
+        if (board_matrix[column][this.location[1]-1].color != "black") {
+          let possible_move = [];
+          possible_move.push(column);
+          possible_move.push(this.location[1]);
+          possible_moves.push(possible_move);
+        }
+        //left above
+        if (board_matrix[column][this.location[1]].color != "black") {
+          let possible_move = [];
+          possible_move.push(column);
+          possible_move.push(this.location[1]+1);
+          possible_moves.push(possible_move);
+        }
+        //left below
+        if (board_matrix[column][this.location[1]-2].color != "black") {
+          let possible_move = [];
+          possible_move.push(column);
+          possible_move.push(this.location[1]-1);
+          possible_moves.push(possible_move);
+        }
       }
     } else if (this.type == "pawn") {
       if (!this.already_moved) {
@@ -43,7 +215,7 @@ class Piece {
         if (this.color == "white") {
           if (this.location[1]+2 < 9) {
             //check if something is in the way
-            if (board_matrix[this.location[0]][this.location[1]+1] == '' && board_matrix[this.location[0]][this.location[1]+2] == '') {
+            if (board_matrix[this.location[0]][this.location[1]] == '' && board_matrix[this.location[0]][this.location[1]+1] == '') {
               let possible_move = [];
               possible_move.push(this.location[0]);
               possible_move.push(this.location[1]+2);
@@ -53,7 +225,7 @@ class Piece {
         } else if (this.color == "black") {
           if (this.location[1]-2 > 0) {
             //check if something is in the way
-            if (board_matrix[this.location[0]][this.location[1]-1] == '' && board_matrix[this.location[0]][this.location[1]-2] == '') {
+            if (board_matrix[this.location[0]][this.location[1]-2] == '' && board_matrix[this.location[0]][this.location[1]-3] == '') {
               let possible_move = [];
               possible_move.push(this.location[0]);
               possible_move.push(this.location[1]-2);
@@ -65,7 +237,7 @@ class Piece {
       if (this.color == "white") {
         if (this.location[1]+1 < 9) {
           //check if something is in the way
-          if (board_matrix[this.location[0]][this.location[1]+1] == '') {
+          if (board_matrix[this.location[0]][this.location[1]] == '') {
             let possible_move = [];
             possible_move.push(this.location[0]);
             possible_move.push(this.location[1]+1);
@@ -75,18 +247,18 @@ class Piece {
       } else if (this.color == "black") {
         if (this.location[1]-1 > 0) {
           //check if something is in the way
-          if (board_matrix[this.location[0]][this.location[1]-1] == '') {
+          if (board_matrix[this.location[0]][this.location[1]-2] == '') {
             let possible_move = [];
             possible_move.push(this.location[0]);
             possible_move.push(this.location[1]-1);
             possible_moves.push(possible_move)
           }
-        }
-        //check if it can capture
-        for (i=0; i < Object.keys(attacking_squares).length; i++) {
-          attacking_squares.push(Object.keys(attacking_squares)[i]);
         }   
-      }   
+      } 
+      //check if it can capture
+      for (i=0; i < Object.keys(attacking_squares).length; i++) {
+        attacking_squares.push(Object.keys(attacking_squares)[i]);
+      }  
     } else if (this.type == "knight") {
       
     } else if (this.type == "bishop") {
@@ -100,7 +272,7 @@ class Piece {
     for (i=0; i < possible_moves.length; i++) {
       let test_board = new Board(board_matrix, []);
       test_board.move(new Piece(this.location, this.type, this.already_moved, this.previous_piece, this.can_en_passant), possible_moves[i]);
-      if (test_board.board_matrix.is_king_in_check()) {
+      if (test_board.is_king_in_check(this.color)) {
         //remove move from possible moves
         possible_moves[i] = undefined;
       }
@@ -111,12 +283,91 @@ class Piece {
     let attacking_squares = [];
     if (this.type == "king") {
       if (this.color == "white") {
+        //behind
+        if (this.location[1]-1 > 0 && this.board_matrix[this.location[0]][this.location[1]-2].color == "black") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]-1);
+          attacking_squares.push(possible_move);
+        }
+        //front
+        if (this.location[1]+1 > 9 && this.board_matrix[this.location[0]][this.location[1]].color == "black") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]+1);
+          attacking_squares.push(possible_move);
+        }
 
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          //left three
+          if (board_matrix[column][this.location[1]-1].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]-2].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
+          }
+
+        }
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          //right three
+          if (board_matrix[column][this.location[1]-1].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]-2].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
+          }
+
+        }
       } else if (this.color == "black") {
-        
+        //in front
+        if (this.location-1 > 0) {
+        }
+        //behind
+        if (this.location+1 > 9) {
+        }
+
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          //right three
+          if (board_matrix[column][this.location[1]-1].color == "white") {
+          } else if (board_matrix[column][this.location[1]-2].color == "white") {
+          } else if (board_matrix[column][this.location[1]].color == "white") {
+          }
+
+        }
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          //left three
+          if (board_matrix[column][this.location[1]-1].color == "white") {
+          } else if (board_matrix[column][this.location[1]-2].color == "white") {
+          } else if (board_matrix[column][this.location[1]].color == "white") {
+          }
+
+        }
       }
     } else if (this.type == "pawn") {
-      //NOTE: add en passente later
       if (this.color == "white") {
         //make sure we aren't at the last row 
         if (this.location[1] != 8) {
