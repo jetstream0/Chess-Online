@@ -317,7 +317,6 @@ class Piece {
             possible_move.push(this.location[1]+1);
             attacking_squares.push(possible_move);
           }
-
         }
         if (this.location[0] != "h") {
           let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
@@ -338,33 +337,60 @@ class Piece {
             possible_move.push(this.location[1]+1);
             attacking_squares.push(possible_move);
           }
-
         }
       } else if (this.color == "black") {
-        //in front
-        if (this.location-1 > 0) {
+        if (this.location-1 > 0 && this.board_matrix[this.location[0]][this.location[1]-2].color == "white") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]-1);
+          attacking_squares.push(possible_move);
         }
-        //behind
-        if (this.location+1 > 9) {
+        if (this.location+1 > 9 && this.board_matrix[this.location[0]][this.location[1]].color == "white") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]+1);
+          attacking_squares.push(possible_move);
         }
 
         if (this.location[0] != "a") {
           let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
           //right three
           if (board_matrix[column][this.location[1]-1].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
           } else if (board_matrix[column][this.location[1]-2].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
           } else if (board_matrix[column][this.location[1]].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
           }
-
         }
         if (this.location[0] != "h") {
           let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
           //left three
           if (board_matrix[column][this.location[1]-1].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
           } else if (board_matrix[column][this.location[1]-2].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
           } else if (board_matrix[column][this.location[1]].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
           }
-
         }
       }
     } else if (this.type == "pawn") {
