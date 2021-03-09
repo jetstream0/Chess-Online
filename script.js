@@ -30,6 +30,182 @@ class Piece {
     this.previous_piece = previous_piece;
     this.can_en_passant = can_en_passant;
   }
+  get_attacking_squares(board_matrix) {
+    let attacking_squares = [];
+    if (this.type == "king") {
+      if (this.color == "white") {
+        //behind
+        if (this.location[1]-1 > 0 && board_matrix[this.location[0]][this.location[1]-2].color == "black") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]-1);
+          attacking_squares.push(possible_move);
+        }
+        //front
+        if (this.location[1]+1 > 9 && board_matrix[this.location[0]][this.location[1]].color == "black") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]+1);
+          attacking_squares.push(possible_move);
+        }
+
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          //left three
+          if (board_matrix[column][this.location[1]-1].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]-2].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
+          }
+        }
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          //right three
+          if (board_matrix[column][this.location[1]-1].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]-2].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]].color == "black") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
+          }
+        }
+      } else if (this.color == "black") {
+        if (this.location-1 > 0 && board_matrix[this.location[0]][this.location[1]-2].color == "white") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]-1);
+          attacking_squares.push(possible_move);
+        }
+        if (this.location+1 > 9 && board_matrix[this.location[0]][this.location[1]].color == "white") {
+          let possible_move = [];
+          possible_move.push(this.location[0]);
+          possible_move.push(this.location[1]+1);
+          attacking_squares.push(possible_move);
+        }
+
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          //right three
+          if (board_matrix[column][this.location[1]-1].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]-2].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
+          }
+        }
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          //left three
+          if (board_matrix[column][this.location[1]-1].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]-2].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            attacking_squares.push(possible_move);
+          } else if (board_matrix[column][this.location[1]].color == "white") {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            attacking_squares.push(possible_move);
+          }
+        }
+      }
+    } else if (this.type == "pawn") {
+      if (this.color == "white") {
+        //make sure we aren't at the last row 
+        if (this.location[1] != 8) {
+          //check if column is not a side column (meaning pawn cannot capture, because it can;t get off the board)
+          if (this.location[0] != "h") {
+            let column_index = Object.keys(board_matrix).indexOf(this.location[0])+1;
+            let column = Object.keys(board_matrix)[column_index];
+            //making sure the square isn't our own piece!
+            if (board_matrix[column][this.location[1]].color == "black") {
+              attacking_squares.push(column+String(this.location[1]));
+            }
+            if (board_matrix[column][this.location[1]-1].color == "black" && board_matrix[column][this.location[1]-1].can_en_passant) {
+              attacking_squares.push(column+String(this.location[1]+1)+"-en_passant");
+            }
+          }
+          if (this.location[0] != "a") {
+            let column = Object.keys(board_matrix)[Object.keys(board_matrix).indexOf(this.location[0])-1];
+            if (board_matrix[column][this.location[1]].color == "black") {
+              attacking_squares.push(column+String(this.location[1]));
+            }
+            if (board_matrix[column][this.location[1]-1].color == "black" && board_matrix[column][this.location[1]-1].can_en_passant) {
+              attacking_squares.push(column+String(this.location[1]+1)+"-en_passant");
+            }
+          }
+        }
+        //check if to the left or the right, there is an enemy pawn. check if en passante is possible on the enemy pawn. if so add to possible moves (add '-en passant' to the end)
+      } else if (this.color == "black") {
+        if (this.location[1] != 1) {
+          //check if column is not a side column (meaning pawn cannot capture, because it can;t get off the board)
+          if (this.location[0] != "h") {
+            let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+            if (board_matrix[column][this.location[1]-2].color == "white") {
+              attacking_squares.push(column+String(this.location[1]));
+            }
+            //check for en passant
+            if (board_matrix[column][this.location[1]-1].color == "white" && board_matrix[column][this.location[1]-1].can_en_passant) {
+              attacking_squares.push(column+String(this.location[1]-1)+"-en_passant");
+            }
+          }
+          if (this.location[0] != "a") {
+            let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+            if (board_matrix[column][this.location[1]-2].color == "white") {
+              attacking_squares.push(column+String(this.location[1]));
+            }
+            if (board_matrix[column][this.location[1]-1].color == "white" && board_matrix[column][this.location[1]-1].can_en_passant) {
+              attacking_squares.push(column+String(this.location[1]-1)+"-en_passant");
+            }
+          }
+        }
+      }
+    } else if (this.type == "knight") {
+      
+    } else if (this.type == "bishop") {
+      
+    } else if (this.type == "queen") {
+      
+    } else if (this.type == "rook") {
+      
+    }
+    return attacking_squares
+  }
   get_possible_moves(board_matrix) {
     //NOTE: make sure moves don't put king in check
     let possible_moves = [];
@@ -260,7 +436,146 @@ class Piece {
         attacking_squares.push(Object.keys(attacking_squares)[i]);
       }  
     } else if (this.type == "knight") {
-      
+      if (this.color == "white") {
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          //left and 2 down
+          if (this.location[1]-2 > 0) {
+            if (board_matrix[column][this.location[1]-3] != "white") {
+              //add to possible moves
+              let possible_move = [];
+              possible_move.push(column);
+              possible_move.push(this.location[1]-2);
+              possible_moves.push(possible_move);
+            }
+          }
+          //left and 2 up
+          if (this.location[1]+2 < 9) {
+            if (board_matrix[column][this.location[1]+1] != "white") {
+              let possible_move = [];
+              possible_move.push(column);
+              possible_move.push(this.location[1]+2);
+              possible_moves.push(possible_move);
+            }
+          }
+        }
+
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          //right and 2 down
+          if (this.location[1]-2 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-2);
+            possible_moves.push(possible_move);
+          }
+          //right and 2 up
+          if (this.location[1]+2 < 9) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+2);
+            possible_moves.push(possible_move);
+          }
+        }
+
+        //two right and one up
+        //two right and one down
+        if (this.location[0] != "a" && this.location[0] != "b") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-2];
+          if (this.location[1]-1 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            possible_moves.push(possible_move);
+          }
+          if (this.location[1]+1 < 9) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            possible_moves.push(possible_move);
+          }
+        }
+
+        //two left and one up
+        //two left and one down
+        if (this.location[0] != "g" && this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+2];
+          if (this.location[1]-1 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            possible_moves.push(possible_move);
+          }
+          if (this.location[1]+1 < 9) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            possible_moves.push(possible_move);
+          }
+        }
+      }
+      else if (this.color == "black") {
+        if (this.location[0] != "a") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
+          if (this.location[1]-2 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-2);
+            possible_moves.push(possible_move);
+          }
+          if (this.location[1]+2 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+2);
+            possible_moves.push(possible_move);
+          }
+        }
+        if (this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
+          if (this.location[1]-2 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-2);
+            possible_moves.push(possible_move);
+          }
+          if (this.location[1]+2 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+2);
+            possible_moves.push(possible_move);
+          }
+        }
+        if (this.location[0] != "a" && this.location[0] != "b") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-2];
+          if (this.location[1]-1 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            possible_moves.push(possible_move);
+          }
+          if (this.location[1]+1 < 9) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            possible_moves.push(possible_move);
+          }
+        }
+        if (this.location[0] != "g" && this.location[0] != "h") {
+          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+2];
+          if (this.location[1]-1 > 0) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]-1);
+            possible_moves.push(possible_move);
+          }
+          if (this.location[1]+1 < 9) {
+            let possible_move = [];
+            possible_move.push(column);
+            possible_move.push(this.location[1]+1);
+            possible_moves.push(possible_move);
+          }
+        }
+      }
     } else if (this.type == "bishop") {
       
     } else if (this.type == "queen") {
@@ -278,181 +593,6 @@ class Piece {
       }
     }
     return possible_moves
-  }
-  get_attacking_squares(board_matrix) {
-    let attacking_squares = [];
-    if (this.type == "king") {
-      if (this.color == "white") {
-        //behind
-        if (this.location[1]-1 > 0 && this.board_matrix[this.location[0]][this.location[1]-2].color == "black") {
-          let possible_move = [];
-          possible_move.push(this.location[0]);
-          possible_move.push(this.location[1]-1);
-          attacking_squares.push(possible_move);
-        }
-        //front
-        if (this.location[1]+1 > 9 && this.board_matrix[this.location[0]][this.location[1]].color == "black") {
-          let possible_move = [];
-          possible_move.push(this.location[0]);
-          possible_move.push(this.location[1]+1);
-          attacking_squares.push(possible_move);
-        }
-
-        if (this.location[0] != "a") {
-          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
-          //left three
-          if (board_matrix[column][this.location[1]-1].color == "black") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]-2].color == "black") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]-1);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]].color == "black") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]+1);
-            attacking_squares.push(possible_move);
-          }
-        }
-        if (this.location[0] != "h") {
-          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
-          //right three
-          if (board_matrix[column][this.location[1]-1].color == "black") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]-2].color == "black") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]-1);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]].color == "black") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]+1);
-            attacking_squares.push(possible_move);
-          }
-        }
-      } else if (this.color == "black") {
-        if (this.location-1 > 0 && this.board_matrix[this.location[0]][this.location[1]-2].color == "white") {
-          let possible_move = [];
-          possible_move.push(this.location[0]);
-          possible_move.push(this.location[1]-1);
-          attacking_squares.push(possible_move);
-        }
-        if (this.location+1 > 9 && this.board_matrix[this.location[0]][this.location[1]].color == "white") {
-          let possible_move = [];
-          possible_move.push(this.location[0]);
-          possible_move.push(this.location[1]+1);
-          attacking_squares.push(possible_move);
-        }
-
-        if (this.location[0] != "a") {
-          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
-          //right three
-          if (board_matrix[column][this.location[1]-1].color == "white") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]-2].color == "white") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]-1);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]].color == "white") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]+1);
-            attacking_squares.push(possible_move);
-          }
-        }
-        if (this.location[0] != "h") {
-          let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
-          //left three
-          if (board_matrix[column][this.location[1]-1].color == "white") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]-2].color == "white") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]-1);
-            attacking_squares.push(possible_move);
-          } else if (board_matrix[column][this.location[1]].color == "white") {
-            let possible_move = [];
-            possible_move.push(column);
-            possible_move.push(this.location[1]+1);
-            attacking_squares.push(possible_move);
-          }
-        }
-      }
-    } else if (this.type == "pawn") {
-      if (this.color == "white") {
-        //make sure we aren't at the last row 
-        if (this.location[1] != 8) {
-          //check if column is not a side column (meaning pawn cannot capture, because it can;t get off the board)
-          if (this.location[0] != "h") {
-            let column_index = Object.keys(board_matrix).indexOf(this.location[0])+1;
-            let column = Object.keys(board_matrix)[column_index];
-            //making sure the square isn't our own piece!
-            if (board_matrix[column][this.location[1]].color == "black") {
-              attacking_squares.push(column+String(this.location[1]));
-            }
-            if (board_matrix[column][this.location[1]-1].color == "black" && board_matrix[column][this.location[1]-1].can_en_passant) {
-              attacking_squares.push(column+String(this.location[1]+1)+"-en_passant");
-            }
-          }
-          if (this.location[0] != "a") {
-            let column = Object.keys(board_matrix)[Object.keys(board_matrix).indexOf(this.location[0])-1];
-            if (board_matrix[column][this.location[1]].color == "black") {
-              attacking_squares.push(column+String(this.location[1]));
-            }
-            if (board_matrix[column][this.location[1]-1].color == "black" && board_matrix[column][this.location[1]-1].can_en_passant) {
-              attacking_squares.push(column+String(this.location[1]+1)+"-en_passant");
-            }
-          }
-        }
-        //check if to the left or the right, there is an enemy pawn. check if en passante is possible on the enemy pawn. if so add to possible moves (add '-en passant' to the end)
-      } else if (this.color == "black") {
-        if (this.location[1] != 1) {
-          //check if column is not a side column (meaning pawn cannot capture, because it can;t get off the board)
-          if (this.location[0] != "h") {
-            let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])+1];
-            if (board_matrix[column][this.location[1]-2].color == "white") {
-              attacking_squares.push(column+String(this.location[1]));
-            }
-            //check for en passant
-            if (board_matrix[column][this.location[1]-1].color == "white" && board_matrix[column][this.location[1]-1].can_en_passant) {
-              attacking_squares.push(column+String(this.location[1]-1)+"-en_passant");
-            }
-          }
-          if (this.location[0] != "a") {
-            let column = Object.keys(board_matrix)[Object.keys(board_matrix).findIndex(this.location[0])-1];
-            if (board_matrix[column][this.location[1]-2].color == "white") {
-              attacking_squares.push(column+String(this.location[1]));
-            }
-            if (board_matrix[column][this.location[1]-1].color == "white" && board_matrix[column][this.location[1]-1].can_en_passant) {
-              attacking_squares.push(column+String(this.location[1]-1)+"-en_passant");
-            }
-          }
-        }
-      }
-    } else if (this.type == "knight") {
-      
-    } else if (this.type == "bishop") {
-      
-    } else if (this.type == "queen") {
-      
-    } else if (this.type == "rook") {
-      
-    }
   }
   change_location(new_location) {
     this.location = new_location;
